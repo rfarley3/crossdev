@@ -1,0 +1,83 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'rbconfig'
+
+Vagrant.configure(2) do |config|
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  #config.vm.box = "base"
+  config.vm.box = "ubuntu/trusty64"
+  # Quick work-around SSL errors inside proxied network
+  config.vm.box_download_insecure = true 
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine.
+  config.vm.network "forwarded_port", guest: 30000, host: 30000
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Allow X over SSH
+  config.ssh.forward_x11 = true
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  config.vm.provider "virtualbox" do |vb|
+    # Display the VirtualBox GUI when booting the machine
+    #vb.gui = true
+    vb.memory = "1024"
+    vb.name = "crossdev"
+  end # do vb
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  config.vm.provision "shell", 
+      inline: <<SHELL
+        sudo apt-get -q -y install g++-mingw-w64
+        sudo apt-get -q -y install python-pefile
+SHELL
+  # g++-mingw-w64 installs: binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 g++-mingw-w64-i686 g++-mingw-w64-x86-64 gcc-mingw-w64-base gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 libstdc++-4.8-dev mingw-w64-common mingw-w64-i686-dev mingw-w64-x86-64-dev
+  # Optional: sudo apt-get -y install python-pip
+  # Optional: apt-get -s install wine1.6 winetricks
+  # Note that wine only runs 32b binaries, and we are outputting 64b
+  # The Linux cross compiler can do 32b binary output for testing though
+
+  # The following is a rough workaround to provide support for Windows hosts
+  # since Ansible does not support Windows control machines.
+  # Taken from https://github.com/geerlingguy/JJG-Ansible-Windows
+  is_windows = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+  if is_windows
+    # Do windows based provisioning
+    #config.vm.provision "shell" do |sh|
+      #sh.path = "provisioning/win_host/windows.sh"
+      #sh.args = "provisioning/builder.yml provisioning/win_host/vagrant_ansible_inventory"
+    #end # do sh
+  else
+    # Do posix based provisioning
+    #config.vm.provision :ansible do |ansible|
+      #ansible.playbook = 'provisioning/builder.yml'
+      #ansible.sudo = true
+      # does this prov need ansible.groups?
+      #ansible.extra_vars = {
+        #host_os: "unix"
+      #}
+    #end # do ansible
+  end # ifelse
+
+  # Assumes the vagrant-proxyconf plugin is installed
+  #config.proxy.http  = "http://<your proxy>:<port>"
+  #config.proxy.https = "http://<your proxy>:<port>"
+  config.proxy.no_proxy = "localhost,127.0.0.1"
+end # do config
