@@ -35,7 +35,7 @@ Use the make bindings from the local machine to build via vagrant; or, vagrant s
     * To use:
         * `curl -o crossdev.zip https://github.com/rfarley3/crossdev/archive/master.zip`
         * `unzip crossdev.zip`
-    * To contribute/track:
+    * Alternatively, to contribute/track:
         * `git clone git@gitlab.mitre.org:rfarley/sanchopanza.git`
         * If this is your first time running git on OS X, then OS X will auto-install command line developer tools; if needed
         * If prompted for a password on the `git clone`, then you need to add an ssh key to your github account:
@@ -43,7 +43,7 @@ Use the make bindings from the local machine to build via vagrant; or, vagrant s
             * Make sure you have a `~/.ssh/id_rsa.pub` otherwise follow https://help.github.com/articles/generating-ssh-keys/
             * github.com > Settings > SSH keys > Add SSH key
 * `cd crossdev`
-* Modify: 'src/Vagrantfile' config.proxy.http and config.proxy.https to reflect your proxy, or comment the section out if you are not behind a proxy.
+* Modify: `src/Vagrantfile` config.proxy.http and config.proxy.https to reflect your proxy, or comment the section out if you are not behind a proxy.
 * `make product`
     * Prompts you to install VirtualBox if not found
     * Prompts you to install Vagrant if not found
@@ -52,10 +52,10 @@ Use the make bindings from the local machine to build via vagrant; or, vagrant s
         * Available at https://github.com/tmatilai/vagrant-proxyconf
         * If you get Ruby Gem errors, then check your shell proxy settings
             * Add appropriate lines to `~/.profile`, like:
-            * http_proxy=http://<proxy url>:<proxy port>
-            * export http_proxy
-            * https_proxy=https://<proxy url>:<proxy port>
-            * export https_proxy
+            * `http_proxy=http://<proxy url>:<proxy port>`
+            * `export http_proxy`
+            * `https_proxy=https://<proxy url>:<proxy port>`
+            * `export https_proxy`
     * Runs `vagrant up` to provision the VM
     * Uses the VM env to compile a sample windows binary
         * Calls makefile within VM
