@@ -11,6 +11,9 @@ BASENAME := superawesome
 # link in this dir to destination (symlink to smb share on target win7 machine)
 DEST_DIR := win7dir
 
+# name of the vm to vagrant (set in  config.vm.define)
+VAGR_NAME := crossdev
+
 #vars:
 #	@echo "Base: $(BASENAME)"
 #	@echo "Args: $(BUILDER_ARGS)"
@@ -54,7 +57,7 @@ vagrant-install: virtbox-install
 	fi
 
 vagrant-up:
-	@(cd src; vagrant status | grep -q default.*running) ; \
+	@(cd src; vagrant status | grep -q $(VAGR_NAME).*running) ; \
 	if [ $$? -eq 0 ]; then \
 		echo "Vagrant VM already up" ; \
 	else \

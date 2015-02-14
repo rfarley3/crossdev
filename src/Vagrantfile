@@ -9,11 +9,16 @@ Vagrant.configure(2) do |config|
   #config.vm.box = "base"
   config.vm.box = "ubuntu/trusty64"
   # Quick work-around SSL errors inside proxied network
-  config.vm.box_download_insecure = true 
+  config.vm.box_download_insecure = true
+  # Give this a name to vagrant other than 'default'
+  config.vm.define "crossdev"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine.
   config.vm.network "forwarded_port", guest: 30000, host: 30000
+  # change the default management port (on the host, default is 2222)
+  # in order to prevent conflicts with other vagrant vms
+  config.vm.network "forwarded_port", guest: 22, host: 9880, id: "ssh"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
