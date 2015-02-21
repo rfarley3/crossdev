@@ -81,8 +81,16 @@ SHELL
     #end # do ansible
   end # ifelse
 
-  # Assumes the vagrant-proxyconf plugin is installed
-  #config.proxy.http  = "http://<your proxy>:<port>"
-  #config.proxy.https = "http://<your proxy>:<port>"
-  config.proxy.no_proxy = "localhost,127.0.0.1"
+
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+    # In case your network requires a proxy, install vagrant-proxyconf plugin
+    #config.proxy.http  = "http://<your proxy>:<port>"
+    #config.proxy.https = "http://<your proxy>:<port>"
+    config.proxy.no_proxy = "localhost,127.0.0.1"
+  end
+
+  if Vagrant.has_plugin?("vagrant-cachier")
+    # this will make future provisioning quicker
+    config.cache.scope = :box
+  end
 end # do config
