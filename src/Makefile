@@ -57,8 +57,10 @@ $(OBJECTS_DIR):
 
 #--- C++ compile
 # this target matches each element in ALL_OBJECT_FILES
-$(OBJECTS_DIR)/%.cpp.o: %.cpp
+$(OBJECTS_DIR)/%.cpp.o: %.cpp Makefile
+ifneq ($<,Makefile)
 	$(CXX) -c $< -o $@ $(CC_FLAGS)
+endif
 
 #--- C++ link
 # ensure the obj dir exists, and then check each element in SOURCES

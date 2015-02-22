@@ -1,7 +1,7 @@
 # Makefile for a Win7 64b build on a linux VM
 
 # phony targets
-.PHONY : default install run virtbox-install vagrant-install vagrant-up clean product buildProduct publish help
+.PHONY : default install run virtbox-install vagrant-install vagrant-up clean product buildProduct publish help vm-ssh vm-resume vm-suspend vm-destroy
 
 # list of any cpp and h that if modified mean that product should be recompiled
 PRODUCT_SOURCES := src/product.cpp src/lib1.cpp src/lib1.h
@@ -23,11 +23,22 @@ default: help
 
 install: vagrant-install vagrant-up product
 
+vm-resume: vagrant-up
+
+vm-suspend:
+	(cd src ; vagrant suspend)
+
+vm-destroy:
+	(cd src ; vagrant destroy)
+
+vm-ssh:
+	(cd src ; vagrant ssh)
+
 # I ran something else here, but this is an example of how to launch
 # a proc on the VM to appear locally (on dev machine), like a GUI 
-# or unit testing script 
+# or driver for the code 
 run: vagrant-up
-	(cd src ; vagrant ssh -c "cd /vagrant; python unitTester.py")
+	(cd src ; vagrant ssh -c "cd /vagrant; python driver.py")
 
 virtbox-install:
 	@(which -s VirtualBox) ; \
@@ -48,13 +59,6 @@ vagrant-install: virtbox-install
 		echo "Goto: https://docs.vagrantup.com/v2/installation/" ; \
 		false; \
 	fi
-	@(cd src; vagrant plugin list | grep -q proxyconf) ; \
-	if [ $$? -eq 0 ]; then \
-		echo "Vagrant proxyconf plugin already installed" ; \
-	else \
-		echo "Installing Vagrant Proxyconf plugin" ; \
-		vagrant plugin install vagrant-proxyconf --plugin-source=http://rubygems.org ; \
-	fi
 
 vagrant-up:
 	@(cd src; vagrant status | grep -q $(VAGR_NAME).*running) ; \
@@ -70,7 +74,7 @@ clean:
 
 product: src/$(BASENAME).exe
 
-src/$(BASENAME).exe: $(PRODUCT_SOURCES)
+src/$(BASENAME).exe: $(PRODUCT_SOURCES) src/Makefile
 	@make vagrant-up 
 	(cd src ; vagrant ssh -c "cd /vagrant; make all EXECUTABLE=$(BASENAME).exe")
 
@@ -109,9 +113,14 @@ help:
 	@echo "Primary Project Makefile. Designed for Posix (Linux/OS X/Cygwin/etc)."
 	@echo "\thelp\t\tThis message"
 	@echo "\tinstall\t\tInstall project inside a Vagrant VM"
-	@echo "\trun\t\tRun the unit tester within Vagrant VM"
+	@echo "\trun\t\tRun the code driver within Vagrant VM"
 	@echo "\tproduct\t\tCompile product code changes within Vagrant VM"
-	#@echo "\tbuildProduct\tBuild product exe within Vagrant VM"
-	#@echo ""
-	#@echo "  If you did a 'make install' then 'make buildProduct' and 'make publish' or 'make unitTest'"
+	@echo "\tvm-ssh\t\tGet shell on Vagrant VM"
+	@echo "\tvm-suspend\tSuspend the Vagrant VM"
+	@echo "\tvm-resume\tResume the Vagrant VM"
+	@echo "\tvm-destroy\tUnprovision the Vagrant VM"
+	@echo "\t\t\tNote that this only preserves data (recursively) under src"
+	@#@echo "\tbuildProduct\tBuild product exe within Vagrant VM"
+	@#@echo ""
+	@#@echo "  If you did a 'make install' then 'make buildProduct' and 'make publish' or 'make unitTest'"
 
